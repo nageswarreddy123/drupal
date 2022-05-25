@@ -1,0 +1,24 @@
+pipeline{
+    agent any
+    stages{
+        stage('git checkout'){
+            steps{
+             checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'b5d6bf13-7ccf-406f-830d-b82b3897edf6', url: 'https://github.com/nageswarreddy123/drupal.git']]])
+            }
+        } 
+        stage('build'){
+            steps{
+                sh 'docker build -t nageswarreddy123/jenkins-test1 .'
+            }
+        }
+        stage('push'){
+            steps{
+                withCredentials([string(credentialsId: 'nageswarreddy123', variable: 'dockerhubpwd')]) {
+                sh 'docker login -u nageswarreddy123 -p ${dockerhubpwd}'
+                
+}
+                sh 'docker push nageswarreddy123/jenkins-test1'
+            }
+        }
+        
+    }
